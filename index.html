@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OpoTests</title>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header class="cabecera">
+    <h1>OpoTests</h1>
+    <p class="subtitulo">Tests de los temas 29 al 60</p>
+  </header>
+
+  <main>
+    <!-- Pantalla 1: selección de tema y modo -->
+    <section id="pantalla-inicio" class="pantalla">
+      <h2>1. Elige el modo</h2>
+      <div class="modos" role="radiogroup" aria-label="Modo de test">
+        <label class="modo">
+          <input type="radio" name="modo" value="estudio" checked>
+          <span class="modo-caja">
+            <strong>Modo estudio</strong>
+            <small>Ves al instante si aciertas o fallas.</small>
+          </span>
+        </label>
+        <label class="modo">
+          <input type="radio" name="modo" value="examen">
+          <span class="modo-caja">
+            <strong>Modo examen</strong>
+            <small>Resultados solo al finalizar el test.</small>
+          </span>
+        </label>
+      </div>
+
+      <div class="temas-cabecera">
+        <h2>2. Elige uno o varios temas</h2>
+        <button id="btn-todos" class="btn btn-pequeno">Seleccionar todos</button>
+      </div>
+      <p class="info izq">1 tema: 30 preguntas · varios temas: 60 · todos los temas: 90. Nunca se repite una pregunta en el mismo test.</p>
+      <div id="lista-temas" class="temas"></div>
+
+      <div class="acciones">
+        <p id="resumen-seleccion" class="resumen-seleccion"></p>
+        <p id="aviso-inicio" class="aviso" hidden></p>
+        <button id="btn-comenzar" class="btn btn-primario" disabled>Comenzar test</button>
+      </div>
+    </section>
+
+    <!-- Pantalla 2: test -->
+    <section id="pantalla-test" class="pantalla" hidden>
+      <div class="test-cabecera">
+        <div>
+          <p id="test-titulo" class="test-titulo"></p>
+          <p id="test-progreso" class="test-progreso"></p>
+        </div>
+        <div class="test-derecha">
+          <span id="marcador" class="marcador" hidden></span>
+          <button id="btn-salir" class="btn btn-texto">Salir</button>
+        </div>
+      </div>
+      <div class="barra"><div id="barra-relleno" class="barra-relleno"></div></div>
+      <p id="aviso-test" class="aviso" hidden></p>
+
+      <article class="tarjeta">
+        <p id="pregunta-texto" class="pregunta-texto"></p>
+        <div id="opciones" class="opciones"></div>
+        <div id="explicacion" class="explicacion" hidden></div>
+      </article>
+
+      <div class="navegacion">
+        <button id="btn-anterior" class="btn">&larr; Anterior</button>
+        <button id="btn-siguiente" class="btn">Siguiente &rarr;</button>
+      </div>
+
+      <div id="mapa" class="mapa" aria-label="Ir a pregunta"></div>
+
+      <div class="acciones">
+        <button id="btn-finalizar" class="btn btn-primario">Finalizar test</button>
+        <p id="info-finalizar" class="info"></p>
+      </div>
+    </section>
+
+    <!-- Pantalla 3: resultados -->
+    <section id="pantalla-resultados" class="pantalla" hidden>
+      <h2 id="res-titulo"></h2>
+      <div class="resumen">
+        <div class="dato"><span id="res-nota" class="dato-valor"></span><span class="dato-etiqueta">Nota</span></div>
+        <div class="dato ok"><span id="res-aciertos" class="dato-valor"></span><span class="dato-etiqueta">Aciertos</span></div>
+        <div class="dato ko"><span id="res-fallos" class="dato-valor"></span><span class="dato-etiqueta">Fallos</span></div>
+        <div class="dato"><span id="res-porcentaje" class="dato-valor"></span><span class="dato-etiqueta">Porcentaje</span></div>
+      </div>
+      <div class="acciones fila">
+        <button id="btn-repetir" class="btn btn-primario">Repetir test</button>
+        <button id="btn-volver" class="btn">Volver a temas</button>
+      </div>
+      <h3>Corrección</h3>
+      <ol id="correccion" class="correccion"></ol>
+    </section>
+  </main>
+
+  <script src="js/app.js"></script>
+  <!-- Bancos de preguntas: un archivo por tema -->
+  <script src="preguntas/tema29.js"></script>
+  <script src="preguntas/tema30.js"></script>
+  <script src="preguntas/tema31.js"></script>
+  <script src="preguntas/tema32.js"></script>
+  <script src="preguntas/tema33.js"></script>
+  <script src="preguntas/tema34.js"></script>
+  <script src="preguntas/tema35.js"></script>
+  <script src="preguntas/tema36.js"></script>
+  <script src="preguntas/tema37.js"></script>
+  <script src="preguntas/tema38.js"></script>
+  <script src="preguntas/tema39.js"></script>
+  <script src="preguntas/tema40.js"></script>
+  <script src="preguntas/tema41.js"></script>
+  <script src="preguntas/tema42.js"></script>
+  <script src="preguntas/tema43.js"></script>
+  <script src="preguntas/tema44.js"></script>
+  <script src="preguntas/tema45.js"></script>
+  <script src="preguntas/tema46.js"></script>
+  <script src="preguntas/tema47.js"></script>
+  <script src="preguntas/tema48.js"></script>
+  <script src="preguntas/tema49.js"></script>
+  <script src="preguntas/tema50.js"></script>
+  <script src="preguntas/tema51.js"></script>
+  <script src="preguntas/tema52.js"></script>
+  <script src="preguntas/tema53.js"></script>
+  <script src="preguntas/tema54.js"></script>
+  <script src="preguntas/tema55.js"></script>
+  <script src="preguntas/tema56.js"></script>
+  <script src="preguntas/tema57.js"></script>
+  <script src="preguntas/tema58.js"></script>
+  <script src="preguntas/tema59.js"></script>
+  <script src="preguntas/tema60.js"></script>
+  <script>iniciarApp();</script>
+</body>
+</html>
