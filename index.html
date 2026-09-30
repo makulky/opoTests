@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OpoTests</title>
-  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/styles.css?v=2">
 </head>
 <body>
   <header class="cabecera">
@@ -37,8 +37,20 @@
         <h2>2. Elige uno o varios temas</h2>
         <button id="btn-todos" class="btn btn-pequeno">Seleccionar todos</button>
       </div>
-      <p class="info izq">1 tema: 30 preguntas · varios temas: 60 · todos los temas: 90. Nunca se repite una pregunta en el mismo test.</p>
+      <p class="info izq">1 tema: 30 preguntas · 2 temas: 60 · 3 o más temas: 80 · todos los temas: 100. Nunca se repite una pregunta en el mismo test.</p>
       <div id="lista-temas" class="temas"></div>
+
+      <div id="config-simulacro" class="config-simulacro" hidden>
+        <h2>3. Simulacro de examen</h2>
+        <p class="info izq">Cronómetro de 120 minutos (al llegar a 120:00 se entrega solo) · nota de 0 a 40 puntos · se aprueba con 18.</p>
+        <label for="sel-penalizacion">Penalización por fallos:</label>
+        <select id="sel-penalizacion">
+          <option value="0">Sin penalización</option>
+          <option value="2">Cada 2 fallos resta 1 acierto</option>
+          <option value="3" selected>Cada 3 fallos resta 1 acierto</option>
+          <option value="4">Cada 4 fallos resta 1 acierto</option>
+        </select>
+      </div>
 
       <div class="acciones">
         <p id="resumen-seleccion" class="resumen-seleccion"></p>
@@ -55,6 +67,7 @@
           <p id="test-progreso" class="test-progreso"></p>
         </div>
         <div class="test-derecha">
+          <span id="cronometro" class="cronometro" hidden>00:00</span>
           <span id="marcador" class="marcador" hidden></span>
           <button id="btn-salir" class="btn btn-texto">Salir</button>
         </div>
@@ -84,12 +97,14 @@
     <!-- Pantalla 3: resultados -->
     <section id="pantalla-resultados" class="pantalla" hidden>
       <h2 id="res-titulo"></h2>
+      <p id="res-veredicto" class="veredicto" hidden></p>
       <div class="resumen">
         <div class="dato"><span id="res-nota" class="dato-valor"></span><span class="dato-etiqueta">Nota</span></div>
         <div class="dato ok"><span id="res-aciertos" class="dato-valor"></span><span class="dato-etiqueta">Aciertos</span></div>
         <div class="dato ko"><span id="res-fallos" class="dato-valor"></span><span class="dato-etiqueta">Fallos</span></div>
         <div class="dato"><span id="res-porcentaje" class="dato-valor"></span><span class="dato-etiqueta">Porcentaje</span></div>
       </div>
+      <p id="res-detalle" class="info" hidden></p>
       <div class="acciones fila">
         <button id="btn-repetir" class="btn btn-primario">Repetir test</button>
         <button id="btn-volver" class="btn">Volver a temas</button>
@@ -99,7 +114,7 @@
     </section>
   </main>
 
-  <script src="js/app.js"></script>
+  <script src="js/app.js?v=2"></script>
   <!-- Bancos de preguntas: un archivo por tema -->
   <script src="preguntas/tema29.js"></script>
   <script src="preguntas/tema30.js"></script>

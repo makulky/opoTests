@@ -6,8 +6,14 @@ const LETRAS = "ABCDEFGH";
 
 // Número de preguntas del test según la selección de temas
 const PREGUNTAS_UN_TEMA = 30;
-const PREGUNTAS_VARIOS_TEMAS = 60;
-const PREGUNTAS_TODOS_TEMAS = 90;
+const PREGUNTAS_DOS_TEMAS = 60;
+const PREGUNTAS_VARIOS_TEMAS = 80;
+const PREGUNTAS_TODOS_TEMAS = 100;
+
+// Simulacro: modo examen con todos los temas
+const DURACION_SIMULACRO_MS = 120 * 60 * 1000;
+const NOTA_MAXIMA = 40;
+const NOTA_APROBADO = 18;
 
 // Bancos de preguntas registrados por los archivos de /preguntas
 const TEMAS = {};
@@ -37,6 +43,12 @@ const estado = {
   respuestas: [],  // índice elegido por pregunta o null
   actual: 0,
   finalizado: false,
+  simulacro: false,
+  penalizacion: 0, // cada N fallos resta 1 acierto (0 = sin penalización)
+  inicio: 0,       // Date.now() al empezar el simulacro
+  fin: 0,
+  temporizador: null,
+  tiempoAgotado: false,
 };
 
 const $ = (id) => document.getElementById(id);
@@ -67,6 +79,29 @@ function guardarModo(modo) {
 function leerModo() {
   try { return localStorage.getItem("opotests-modo"); } catch (e) { return null; }
 }
+function guardarPenalizacion(n) {
+  try { localStorage.setItem("opotests-penalizacion", String(n)); } catch (e) { /* sin almacenamiento */ }
+}
+function leerPenalizacion() {
+  try { return localStorage.getItem("opotests-penalizacion"); } catch (e) { return null; }
+}
+
+function modoSeleccionado() {
+  return document.querySelector('input[name="modo"]:checked').value;
+}
+
+function esSimulacro(modo, temas) {
+  return modo === "examen" && esSeleccionTodos(temas);
+}
+
+function formatearTiempo(ms) {
+  const s = Math.floor(ms / 1000);
+  return `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+}
+
+function formatearNumero(n) {
+  return n.toFixed(2).replace(".", ",");
+}
 
 /* ---------- Selección de temas ---------- */
 
@@ -86,7 +121,8 @@ function esSeleccionTodos(temas) {
 
 function preguntasObjetivo(temas) {
   if (temas.length <= 1) return PREGUNTAS_UN_TEMA;
-  return esSeleccionTodos(temas) ? PREGUNTAS_TODOS_TEMAS : PREGUNTAS_VARIOS_TEMAS;
+  if (esSeleccionTodos(temas)) return PREGUNTAS_TODOS_TEMAS;
+  return temas.length === 2 ? PREGUNTAS_DOS_TEMAS : PREGUNTAS_VARIOS_TEMAS;
 }
 
 // Dos preguntas con el mismo enunciado se consideran la misma (aunque estén en temas distintos)
@@ -152,6 +188,7 @@ function actualizarResumenSeleccion() {
   const resumen = $("resumen-seleccion");
   const aviso = $("aviso-inicio");
   const btn = $("btn-comenzar");
+  $("config-simulacro").hidden = !esSimulacro(modoSeleccionado(), temas);
 
   if (temas.length === 0) {
     resumen.textContent = "Ningún tema seleccionado.";
@@ -219,20 +256,30 @@ function sortearPreguntas(temas, cantidad) {
 function comenzarTest(temas) {
   if (temas.length === 0) return;
 
-  estado.modo = document.querySelector('input[name="modo"]:checked').value;
+  estado.modo = modoSeleccionado();
   guardarModo(estado.modo);
 
   const objetivo = preguntasObjetivo(temas);
   const preguntas = sortearPreguntas(temas, objetivo);
   if (preguntas.length === 0) return;
+  detenerCronometro();
   estado.temasTest = temas;
   estado.preguntas = preguntas;
   estado.respuestas = preguntas.map(() => null);
   estado.actual = 0;
   estado.finalizado = false;
+  estado.simulacro = esSimulacro(estado.modo, temas);
+  estado.tiempoAgotado = false;
+  if (estado.simulacro) {
+    estado.penalizacion = Number($("sel-penalizacion").value);
+    guardarPenalizacion(estado.penalizacion);
+    iniciarCronometro();
+  }
+  $("cronometro").hidden = !estado.simulacro;
 
   const total = preguntas.length;
-  $("test-titulo").textContent = `${descripcionTemas(temas)} · ${estado.modo === "estudio" ? "Modo estudio" : "Modo examen"}`;
+  const modoTexto = estado.simulacro ? "Simulacro de examen" : estado.modo === "estudio" ? "Modo estudio" : "Modo examen";
+  $("test-titulo").textContent = `${descripcionTemas(temas)} · ${modoTexto}`;
   $("marcador").hidden = estado.modo !== "estudio";
   const aviso = $("aviso-test");
   aviso.hidden = total >= objetivo;
@@ -241,6 +288,29 @@ function comenzarTest(temas) {
   pintarMapa();
   pintarPregunta();
   mostrarPantalla("pantalla-test");
+}
+
+/* ---------- Cronómetro del simulacro ---------- */
+
+function iniciarCronometro() {
+  estado.inicio = Date.now();
+  estado.fin = 0;
+  actualizarCronometro();
+  estado.temporizador = setInterval(actualizarCronometro, 1000);
+}
+
+function detenerCronometro() {
+  if (estado.temporizador !== null) clearInterval(estado.temporizador);
+  estado.temporizador = null;
+  if (estado.simulacro && !estado.fin) estado.fin = Date.now();
+}
+
+function actualizarCronometro() {
+  const transcurrido = Math.min(Date.now() - estado.inicio, DURACION_SIMULACRO_MS);
+  const crono = $("cronometro");
+  crono.textContent = `⏱ ${formatearTiempo(transcurrido)} / ${formatearTiempo(DURACION_SIMULACRO_MS)}`;
+  crono.classList.toggle("final", DURACION_SIMULACRO_MS - transcurrido <= 10 * 60 * 1000);
+  if (transcurrido >= DURACION_SIMULACRO_MS) finalizarTest(true);
 }
 
 function contarAciertos() {
@@ -352,10 +422,16 @@ function actualizarMapa() {
   });
 }
 
-function finalizarTest() {
-  if (contarRespondidas() < estado.preguntas.length) return;
-  if (estado.modo === "examen" && !confirm("¿Seguro que quieres finalizar el examen?")) return;
+function finalizarTest(porTiempo = false) {
+  if (estado.finalizado) return;
+  if (!porTiempo) {
+    if (contarRespondidas() < estado.preguntas.length) return;
+    if (estado.modo === "examen" && !confirm("¿Seguro que quieres finalizar el examen?")) return;
+  }
   estado.finalizado = true;
+  estado.tiempoAgotado = porTiempo;
+  detenerCronometro();
+  if (porTiempo) alert("Se han agotado los 120 minutos. El examen se ha entregado automáticamente; las preguntas sin responder cuentan en blanco.");
   pintarResultados();
   mostrarPantalla("pantalla-resultados");
 }
@@ -366,6 +442,7 @@ function salirTest() {
 }
 
 function volverInicio() {
+  detenerCronometro();
   pintarTemas();
   mostrarPantalla("pantalla-inicio");
 }
@@ -375,10 +452,39 @@ function volverInicio() {
 function pintarResultados() {
   const total = estado.preguntas.length;
   const aciertos = contarAciertos();
-  const fallos = total - aciertos;
+  const enBlanco = total - contarRespondidas();
+  const fallos = total - aciertos - enBlanco;
 
-  $("res-titulo").textContent = `Resultados · ${descripcionTemas(estado.temasTest)}`;
-  $("res-nota").textContent = ((aciertos / total) * 10).toFixed(2).replace(".", ",");
+  $("res-titulo").textContent = `Resultados · ${descripcionTemas(estado.temasTest)}` +
+    (estado.simulacro ? " · Simulacro" : "");
+
+  const veredicto = $("res-veredicto");
+  const detalle = $("res-detalle");
+  if (estado.simulacro) {
+    const descuento = estado.penalizacion ? fallos / estado.penalizacion : 0;
+    const netos = Math.max(0, aciertos - descuento);
+    const puntos = (netos / total) * NOTA_MAXIMA;
+    const aprobado = puntos >= NOTA_APROBADO;
+    $("res-nota").textContent = `${formatearNumero(puntos)} / ${NOTA_MAXIMA}`;
+    veredicto.textContent = aprobado
+      ? `APROBADO (mínimo ${NOTA_APROBADO} puntos)`
+      : `SUSPENSO (mínimo ${NOTA_APROBADO} puntos)`;
+    veredicto.className = `veredicto ${aprobado ? "ok" : "ko"}`;
+    veredicto.hidden = false;
+    detalle.textContent = [
+      `Tiempo: ${formatearTiempo(estado.fin - estado.inicio)}${estado.tiempoAgotado ? " (tiempo agotado)" : ""}`,
+      `En blanco: ${enBlanco}`,
+      estado.penalizacion
+        ? `Penalización: cada ${estado.penalizacion} fallos resta 1 acierto (−${formatearNumero(descuento)})`
+        : "Sin penalización",
+      `Aciertos netos: ${formatearNumero(netos)}`,
+    ].join(" · ");
+    detalle.hidden = false;
+  } else {
+    $("res-nota").textContent = formatearNumero((aciertos / total) * 10);
+    veredicto.hidden = true;
+    detalle.hidden = true;
+  }
   $("res-aciertos").textContent = aciertos;
   $("res-fallos").textContent = fallos;
   $("res-porcentaje").textContent = `${Math.round((aciertos / total) * 100)}%`;
@@ -389,7 +495,8 @@ function pintarResultados() {
     const r = estado.respuestas[i];
     const acierto = r === p.correcta;
     const li = document.createElement("li");
-    if (!acierto) li.classList.add("fallo");
+    if (r === null) li.classList.add("blanco");
+    else if (!acierto) li.classList.add("fallo");
 
     const enun = document.createElement("p");
     enun.className = "enunciado";
@@ -397,8 +504,13 @@ function pintarResultados() {
     li.appendChild(enun);
 
     const tuya = document.createElement("p");
-    tuya.className = `tu-respuesta ${acierto ? "ok" : "ko"}`;
-    tuya.textContent = `${acierto ? "✔" : "✘"} Tu respuesta: ${LETRAS[r]}) ${p.opciones[r]}`;
+    if (r === null) {
+      tuya.className = "tu-respuesta blanco";
+      tuya.textContent = "— Sin responder";
+    } else {
+      tuya.className = `tu-respuesta ${acierto ? "ok" : "ko"}`;
+      tuya.textContent = `${acierto ? "✔" : "✘"} Tu respuesta: ${LETRAS[r]}) ${p.opciones[r]}`;
+    }
     li.appendChild(tuya);
 
     if (!acierto) {
@@ -424,12 +536,18 @@ function iniciarApp() {
     const radio = document.querySelector(`input[name="modo"][value="${modoGuardado}"]`);
     if (radio) radio.checked = true;
   }
+  const penalizacionGuardada = leerPenalizacion();
+  if (penalizacionGuardada !== null && $("sel-penalizacion").querySelector(`option[value="${penalizacionGuardada}"]`)) {
+    $("sel-penalizacion").value = penalizacionGuardada;
+  }
+  document.querySelectorAll('input[name="modo"]').forEach((radio) =>
+    radio.addEventListener("change", actualizarResumenSeleccion));
 
   $("btn-comenzar").addEventListener("click", () => comenzarTest(temasOrdenados()));
   $("btn-todos").addEventListener("click", alternarTodos);
   $("btn-anterior").addEventListener("click", () => irA(estado.actual - 1));
   $("btn-siguiente").addEventListener("click", () => irA(estado.actual + 1));
-  $("btn-finalizar").addEventListener("click", finalizarTest);
+  $("btn-finalizar").addEventListener("click", () => finalizarTest());
   $("btn-salir").addEventListener("click", salirTest);
   $("btn-repetir").addEventListener("click", () => comenzarTest(estado.temasTest));
   $("btn-volver").addEventListener("click", volverInicio);

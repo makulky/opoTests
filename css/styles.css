@@ -247,3 +247,36 @@ h3 { font-size: 1.05rem; margin: 28px 0 12px; }
 .info.izq { text-align: left; margin: 0 0 12px; }
 .resumen-seleccion { font-weight: 600; margin: 0 0 8px; }
 .tema.seleccionado strong::before { content: "✔ "; color: var(--primario); }
+
+/* Simulacro de examen */
+.config-simulacro {
+  margin-top: 24px;
+  padding: 14px;
+  border: 2px solid var(--primario);
+  border-radius: var(--radio);
+  background: var(--primario-suave);
+}
+.config-simulacro h2 { margin: 0 0 4px; }
+.config-simulacro label { font-weight: 600; margin-right: 8px; }
+.config-simulacro select {
+  font: inherit;
+  padding: 6px 10px;
+  border: 1px solid var(--borde);
+  border-radius: 6px;
+  background: var(--superficie);
+  color: var(--texto);
+}
+.cronometro { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.cronometro.final { color: var(--ko); }
+.veredicto {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  padding: 10px;
+  border-radius: var(--radio);
+  margin: 0 0 12px;
+}
+.veredicto.ok { color: var(--ok); background: var(--ok-suave); }
+.veredicto.ko { color: var(--ko); background: var(--ko-suave); }
+.correccion li.blanco { border-left-color: var(--aviso); }
+.correccion .tu-respuesta.blanco { color: var(--aviso); }

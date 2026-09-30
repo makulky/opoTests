@@ -5,13 +5,15 @@ Web para hacer tests de los **temas 29 al 60**. Puedes elegir uno, varios o todo
 | Selección | Preguntas |
 |---|---|
 | 1 tema | 30 |
-| Varios temas | 60 |
-| Todos los temas | 90 |
+| 2 temas | 60 |
+| 3 o más temas | 80 |
+| Todos los temas | 100 |
 
 Las preguntas se eligen al azar y repartidas por igual entre los temas elegidos. Nunca se repite una pregunta en el mismo test (dos preguntas con el mismo enunciado cuentan como la misma). Las opciones también salen en orden aleatorio.
 
 - **Modo estudio**: al responder ves al momento si aciertas, cuál era la correcta y la explicación.
 - **Modo examen**: no ves nada hasta responder todas y pulsar *Finalizar*; entonces aparecen nota, aciertos, fallos y la corrección completa.
+- **Simulacro** (modo examen + todos los temas): cronómetro de 120 minutos (al llegar a 120:00 el examen se entrega solo; las no respondidas cuentan en blanco), penalización elegible (sin penalización o cada 2, 3 o 4 fallos resta un acierto) y nota de 0 a 40 puntos. Se aprueba con 18 puntos.
 
 ## Cómo abrirla
 Haz doble clic en `index.html`. No necesita instalación ni servidor ni internet.
