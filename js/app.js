@@ -67,11 +67,37 @@ function plural(n, palabra) {
 }
 
 function mostrarPantalla(id) {
-  ["pantalla-inicio", "pantalla-test", "pantalla-resultados"].forEach((p) => {
-    $(p).hidden = p !== id;
+  document.querySelectorAll("main > .pantalla").forEach((p) => {
+    p.hidden = p.id !== id;
   });
   window.scrollTo(0, 0);
 }
+
+/* Diálogo propio: confirm() y alert() no funcionan dentro de claude.ai */
+function abrirDialogo(texto, conCancelar) {
+  return new Promise((resolver) => {
+    const fondo = $("dialogo");
+    $("dialogo-texto").textContent = texto;
+    $("dialogo-cancelar").hidden = !conCancelar;
+    fondo.hidden = false;
+    $("dialogo-aceptar").focus();
+    const cerrar = (valor) => {
+      fondo.hidden = true;
+      $("dialogo-aceptar").onclick = null;
+      $("dialogo-cancelar").onclick = null;
+      document.removeEventListener("keydown", tecla, true);
+      resolver(valor);
+    };
+    const tecla = (e) => {
+      if (e.key === "Escape") { e.stopPropagation(); cerrar(false); }
+    };
+    $("dialogo-aceptar").onclick = () => cerrar(true);
+    $("dialogo-cancelar").onclick = () => cerrar(false);
+    document.addEventListener("keydown", tecla, true);
+  });
+}
+function confirmar(texto) { return abrirDialogo(texto, true); }
+function avisar(texto) { return abrirDialogo(texto, false); }
 
 function guardarModo(modo) {
   try { localStorage.setItem("opotests-modo", modo); } catch (e) { /* sin almacenamiento */ }
@@ -422,22 +448,24 @@ function actualizarMapa() {
   });
 }
 
-function finalizarTest(porTiempo = false) {
+async function finalizarTest(porTiempo = false) {
   if (estado.finalizado) return;
   if (!porTiempo) {
     if (contarRespondidas() < estado.preguntas.length) return;
-    if (estado.modo === "examen" && !confirm("¿Seguro que quieres finalizar el examen?")) return;
+    if (estado.modo === "examen" && !(await confirmar("¿Seguro que quieres finalizar el examen?"))) return;
+    if (estado.finalizado) return;
   }
   estado.finalizado = true;
   estado.tiempoAgotado = porTiempo;
   detenerCronometro();
-  if (porTiempo) alert("Se han agotado los 120 minutos. El examen se ha entregado automáticamente; las preguntas sin responder cuentan en blanco.");
   pintarResultados();
   mostrarPantalla("pantalla-resultados");
+  if (porTiempo) avisar("Se han agotado los 120 minutos. El examen se ha entregado automáticamente; las preguntas sin responder cuentan en blanco.");
 }
 
-function salirTest() {
-  if (contarRespondidas() > 0 && !confirm("Si sales perderás el progreso de este test. ¿Salir?")) return;
+async function salirTest() {
+  if (contarRespondidas() > 0 && !(await confirmar("Si sales perderás el progreso de este test. ¿Salir?"))) return;
+  if (estado.finalizado) return;
   volverInicio();
 }
 
@@ -551,10 +579,14 @@ function iniciarApp() {
   $("btn-salir").addEventListener("click", salirTest);
   $("btn-repetir").addEventListener("click", () => comenzarTest(estado.temasTest));
   $("btn-volver").addEventListener("click", volverInicio);
+  $("btn-elegir-tests").addEventListener("click", volverInicio);
+  $("btn-elegir-supuestos").addEventListener("click", () => mostrarPantalla("pantalla-supuesto-inicio"));
+  $("btn-tests-volver").addEventListener("click", () => mostrarPantalla("pantalla-eleccion"));
+  $("btn-sup-volver").addEventListener("click", () => mostrarPantalla("pantalla-eleccion"));
 
   // Atajos de teclado en el test: flechas para navegar, 1-8 o A-H para responder
   document.addEventListener("keydown", (e) => {
-    if ($("pantalla-test").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
+    if ($("pantalla-test").hidden || !$("dialogo").hidden || e.ctrlKey || e.metaKey || e.altKey) return;
     if (e.key === "ArrowLeft") irA(estado.actual - 1);
     else if (e.key === "ArrowRight") irA(estado.actual + 1);
     else {
@@ -567,4 +599,6 @@ function iniciarApp() {
   });
 
   pintarTemas();
+  iniciarSupuestos();
+  mostrarPantalla("pantalla-eleccion");
 }

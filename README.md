@@ -1,6 +1,10 @@
 # OpoTests
 
-Web para hacer tests de los **temas 29 al 60**. Puedes elegir uno, varios o todos los temas:
+Web para preparar los **temas 29 al 60**. Al entrar eliges entre **Tests** y **Supuestos prácticos**.
+
+## Tests
+
+Puedes elegir uno, varios o todos los temas:
 
 | Selección | Preguntas |
 |---|---|
@@ -14,6 +18,14 @@ Las preguntas se eligen al azar y repartidas por igual entre los temas elegidos.
 - **Modo estudio**: al responder ves al momento si aciertas, cuál era la correcta y la explicación.
 - **Modo examen**: no ves nada hasta responder todas y pulsar *Finalizar*; entonces aparecen nota, aciertos, fallos y la corrección completa.
 - **Simulacro** (modo examen + todos los temas): cronómetro de 120 minutos (al llegar a 120:00 el examen se entrega solo; las no respondidas cuentan en blanco), penalización elegible (sin penalización o cada 2, 3 o 4 fallos resta un acierto) y nota de 0 a 40 puntos. Se aprueba con 18 puntos.
+
+## Supuestos prácticos
+Claude prepara 5 supuestos prácticos de temas distintos elegidos al azar entre todo el temario, basados en las preguntas tipo test y planteados como casos reales del puesto de Técnico de Servicios Generales (Secretaría General del Ayuntamiento, ver `supuestos guia.jpeg`). Escribes tus respuestas y, al entregar, Claude las corrige:
+
+- Cada supuesto vale 12 puntos: nota total sobre **60**. Se aprueba con **30**.
+- Para cada supuesto: puntuación, valoración (bien, mejorable, incompleta, incorrecta, en blanco), comentario, qué podrías haber desarrollado más y los puntos clave de una respuesta completa.
+
+Esta parte **solo funciona abriendo la web desde su enlace de claude.ai** (publicada como Artifact), porque usa la cuenta de Claude de quien la abre: gasta de su límite de uso del plan (por ejemplo Pro), sin coste extra ni API key. Abriendo `index.html` en local los tests funcionan igual y los supuestos muestran un aviso.
 
 ## Cómo abrirla
 Haz doble clic en `index.html`. No necesita instalación ni servidor ni internet.

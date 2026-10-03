@@ -4,17 +4,33 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OpoTests</title>
-  <link rel="stylesheet" href="css/styles.css?v=2">
+  <link rel="stylesheet" href="css/styles.css?v=3">
 </head>
 <body>
   <header class="cabecera">
     <h1>OpoTests</h1>
-    <p class="subtitulo">Tests de los temas 29 al 60</p>
+    <p class="subtitulo">Tests y supuestos prácticos de los temas 29 al 60</p>
   </header>
 
   <main>
+    <!-- Pantalla 0: elegir entre tests y supuestos prácticos -->
+    <section id="pantalla-eleccion" class="pantalla">
+      <h2>¿Qué quieres practicar?</h2>
+      <div class="eleccion">
+        <button id="btn-elegir-tests" class="eleccion-caja">
+          <strong>Tests</strong>
+          <span>Preguntas tipo test de los temas que elijas, en modo estudio, examen o simulacro.</span>
+        </button>
+        <button id="btn-elegir-supuestos" class="eleccion-caja">
+          <strong>Supuestos prácticos</strong>
+          <span>5 supuestos de desarrollo de todo el temario. Claude los prepara y te corrige sobre 60 puntos.</span>
+        </button>
+      </div>
+    </section>
+
     <!-- Pantalla 1: selección de tema y modo -->
-    <section id="pantalla-inicio" class="pantalla">
+    <section id="pantalla-inicio" class="pantalla" hidden>
+      <button id="btn-tests-volver" class="btn btn-texto volver">&larr; Volver</button>
       <h2>1. Elige el modo</h2>
       <div class="modos" role="radiogroup" aria-label="Modo de test">
         <label class="modo">
@@ -112,9 +128,86 @@
       <h3>Corrección</h3>
       <ol id="correccion" class="correccion"></ol>
     </section>
+
+    <!-- Supuestos 1: generar -->
+    <section id="pantalla-supuesto-inicio" class="pantalla" hidden>
+      <button id="btn-sup-volver" class="btn btn-texto volver">&larr; Volver</button>
+      <h2>Supuestos prácticos</h2>
+      <div class="tarjeta sup-info">
+        <p>Claude prepara <strong>5 supuestos prácticos</strong> de temas distintos elegidos al azar entre todo el temario, planteados como casos reales del puesto de Técnico de Servicios Generales de la Secretaría General del Ayuntamiento.</p>
+        <ul>
+          <li>Cada supuesto vale <strong>12 puntos</strong>: nota total sobre <strong>60</strong>.</li>
+          <li>Se aprueba con <strong>30 puntos</strong>.</li>
+          <li>Al entregar, Claude corrige cada respuesta: qué está bien, qué está mal y qué podrías haber desarrollado más.</li>
+        </ul>
+        <p class="info">Usa tu cuenta de Claude: la primera vez te pedirá permiso.</p>
+      </div>
+      <p id="sup-no-disponible" class="aviso" hidden></p>
+      <div id="sup-cargando-inicio" class="cargando" hidden>
+        <span class="girando" aria-hidden="true"></span>
+        <p class="cargando-texto" role="status"></p>
+        <button id="btn-cancelar-generar" class="btn btn-pequeno">Cancelar</button>
+      </div>
+      <div id="sup-error-inicio" class="aviso con-boton" hidden>
+        <span class="error-texto"></span>
+        <button class="btn btn-pequeno btn-reintentar">Reintentar</button>
+      </div>
+      <div class="acciones">
+        <button id="btn-generar" class="btn btn-primario" disabled>Generar supuestos</button>
+      </div>
+    </section>
+
+    <!-- Supuestos 2: responder -->
+    <section id="pantalla-supuesto" class="pantalla" hidden>
+      <div class="test-cabecera">
+        <div>
+          <p class="test-titulo">Supuestos prácticos</p>
+          <p id="sup-progreso" class="test-progreso"></p>
+        </div>
+        <button id="btn-salir-supuesto" class="btn btn-texto">Salir</button>
+      </div>
+      <div id="lista-supuestos" class="lista-supuestos"></div>
+      <div id="sup-cargando-test" class="cargando" hidden>
+        <span class="girando" aria-hidden="true"></span>
+        <p class="cargando-texto" role="status"></p>
+        <button id="btn-cancelar-corregir" class="btn btn-pequeno">Cancelar</button>
+      </div>
+      <div id="sup-error-test" class="aviso con-boton" hidden>
+        <span class="error-texto"></span>
+        <button class="btn btn-pequeno btn-reintentar">Reintentar</button>
+      </div>
+      <div class="acciones">
+        <button id="btn-entregar" class="btn btn-primario">Entregar para corregir</button>
+      </div>
+    </section>
+
+    <!-- Supuestos 3: resultados -->
+    <section id="pantalla-supuesto-resultados" class="pantalla" hidden>
+      <h2>Resultados · Supuestos prácticos</h2>
+      <p id="sup-res-veredicto" class="veredicto"></p>
+      <div class="dato sup-nota"><span id="sup-res-nota" class="dato-valor"></span><span class="dato-etiqueta">Nota</span></div>
+      <p id="sup-res-general" class="sup-general" hidden></p>
+      <div class="acciones fila">
+        <button id="btn-nuevo-supuesto" class="btn btn-primario">Nuevos supuestos</button>
+        <button id="btn-sup-volver-inicio" class="btn">Volver al inicio</button>
+      </div>
+      <h3>Corrección</h3>
+      <ol id="sup-correccion" class="correccion sup-correccion"></ol>
+    </section>
   </main>
 
-  <script src="js/app.js?v=2"></script>
+  <div id="dialogo" class="dialogo-fondo" hidden>
+    <div class="dialogo" role="alertdialog" aria-modal="true" aria-labelledby="dialogo-texto">
+      <p id="dialogo-texto"></p>
+      <div class="acciones fila">
+        <button id="dialogo-cancelar" class="btn">Cancelar</button>
+        <button id="dialogo-aceptar" class="btn btn-primario">Aceptar</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js?v=3"></script>
+  <script src="js/supuestos.js?v=1"></script>
   <!-- Bancos de preguntas: un archivo por tema -->
   <script src="preguntas/tema29.js"></script>
   <script src="preguntas/tema30.js"></script>
