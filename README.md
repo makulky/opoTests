@@ -30,7 +30,9 @@ Esta parte **solo funciona abriendo la web desde su enlace de claude.ai** (publi
 ## Cómo abrirla
 Haz doble clic en `index.html`. No necesita instalación ni servidor ni internet.
 
-Para publicarla en internet gratis, sube la carpeta completa a GitHub Pages o Netlify (arrastrar y soltar en https://app.netlify.com/drop).
+Para publicarla en internet gratis con **Vercel**: importa el repositorio de GitHub en https://vercel.com/new, deja *Framework Preset* en **Other**, sin comando de build ni directorio de salida, y despliega. Cada `git push` vuelve a publicarla. La configuración está en `vercel.json` y `.vercelignore` (no se sube la imagen de la ficha del puesto).
+
+En Vercel funcionan los tests; los supuestos prácticos muestran un enlace a la versión de claude.ai, que es donde funcionan.
 
 ## Cómo añadir preguntas
 Edita el archivo del tema en `preguntas/` (por ejemplo `preguntas/tema35.js`) con cualquier editor de texto:

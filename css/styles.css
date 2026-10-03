@@ -146,6 +146,7 @@ h3 { font-size: 1.05rem; margin: 28px 0 12px; }
 .acciones { margin-top: 24px; text-align: center; }
 .acciones.fila { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
 .info { color: var(--texto-suave); font-size: .9rem; margin: 8px 0 0; }
+.aviso a { color: inherit; font-weight: 600; }
 .aviso {
   background: var(--aviso-suave);
   color: var(--aviso);

@@ -6,6 +6,9 @@ const NOTA_MAXIMA_SUPUESTO = NUM_SUPUESTOS * PUNTOS_POR_SUPUESTO; // 60
 const NOTA_APROBADO_SUPUESTO = 30;
 const PREGUNTAS_MATERIAL_POR_TEMA = 8;
 
+// Versión publicada en claude.ai, donde funcionan los supuestos (fuera de ahí, p. ej. en Vercel, solo los tests)
+const ENLACE_CLAUDE = "https://claude.ai/artifact/9diHqHLfTYB3Vj8iitUBU5";
+
 // Perfil del puesto (transcrito de la ficha "supuestos guia.jpeg")
 const PERFIL_PUESTO = `Puesto: Técnico/a de Servicios Generales (Grupo A2, escala de Administración General) de la Secretaría General de un Ayuntamiento andaluz. Superior jerárquico: Secretario General. Centro: Casa Consistorial.
 Responsabilidades generales: asesorar y emitir informes jurídicos con carácter general; tramitación de procedimientos de responsabilidad patrimonial.
@@ -101,7 +104,17 @@ async function prepararSupuestos() {
 function marcarNoDisponible(texto) {
   sup.disponible = false;
   const aviso = $("sup-no-disponible");
-  aviso.textContent = texto || "Los supuestos prácticos solo funcionan abriendo OpoTests desde su enlace de claude.ai, porque es Claude quien prepara y corrige las preguntas. Los tests funcionan en cualquier sitio.";
+  if (texto) {
+    aviso.textContent = texto;
+  } else {
+    aviso.textContent = "Los supuestos prácticos solo funcionan abriendo OpoTests desde claude.ai, porque es Claude quien prepara y corrige las preguntas. Los tests funcionan en cualquier sitio. ";
+    const enlace = document.createElement("a");
+    enlace.href = ENLACE_CLAUDE;
+    enlace.target = "_blank";
+    enlace.rel = "noopener";
+    enlace.textContent = "Abrir OpoTests en claude.ai";
+    aviso.appendChild(enlace);
+  }
   aviso.hidden = false;
   $("btn-generar").disabled = true;
 }
