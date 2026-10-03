@@ -59,6 +59,9 @@
 
 * { box-sizing: border-box; }
 
+/* Los elementos con el atributo hidden se ocultan siempre, aunque tengan display propio */
+[hidden] { display: none !important; }
+
 body {
   margin: 0;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
